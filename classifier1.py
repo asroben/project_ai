@@ -1,7 +1,9 @@
 
 # coding: utf-8
 
-# In[24]:
+# # NOTES
+
+# In[40]:
 
 
 # Steps made:
@@ -40,7 +42,7 @@
 # 7. Save trained classifier on disk
 
 
-# In[25]:
+# In[41]:
 
 
 # License: BSD
@@ -63,7 +65,25 @@ import copy
 plt.ion()   # interactive mode
 
 
-# In[26]:
+# ### Model Settings
+
+# In[42]:
+
+
+# SETTINGS
+BATCH_SIZE = 3
+NUM_CLASSES = 5
+NUM_EPOCHS = 1
+
+
+# Local Directory
+data_dir = 'augmented_data'
+
+# Directory on DAS4
+#data_dir = '/var/scratch/prai1809'
+
+
+# In[43]:
 
 
 # The CNN we use wants input dimensions of 3x224x224
@@ -94,8 +114,6 @@ data_transforms = {
 #   - /val
 #       - /class_1
 #       - /class_2
-data_dir = 'augmented_data'
-BATCH_SIZE = 3
 
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])
@@ -109,46 +127,48 @@ class_names = image_datasets['train'].classes
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-# In[27]:
+# In[44]:
 
 
 image_datasets['train'].classes
 
 
-# In[28]:
+# In[45]:
 
 
-for i,c in iter(dataloaders['train']):
-    print(len(i))
-    print(c)
+# for i,c in iter(dataloaders['train']):
+#     print(len(i))
+#     print(c)
 
 
-# In[29]:
+# In[46]:
 
 
-def imshow(inp, title=None):
-    """Imshow for Tensor."""
-    inp = inp.numpy().transpose((1, 2, 0))
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    inp = std * inp + mean
-    inp = np.clip(inp, 0, 1)
-    plt.imshow(inp)
-    if title is not None:
-        plt.title(title)
-    plt.pause(0.001)  # pause a bit so that plots are updated
+# COMMENT OUT WHEN RUNNING SCRIPT ON SERVER
+
+# def imshow(inp, title=None):
+#     """Imshow for Tensor."""
+#     inp = inp.numpy().transpose((1, 2, 0))
+#     mean = np.array([0.485, 0.456, 0.406])
+#     std = np.array([0.229, 0.224, 0.225])
+#     inp = std * inp + mean
+#     inp = np.clip(inp, 0, 1)
+#     plt.imshow(inp)
+#     if title is not None:
+#         plt.title(title)
+#     plt.pause(0.001)  # pause a bit so that plots are updated
 
 
-# Get a batch of training data
-inputs, classes = next(iter(dataloaders['train']))
+# # Get a batch of training data
+# inputs, classes = next(iter(dataloaders['train']))
 
-# Make a grid from batch
-out = torchvision.utils.make_grid(inputs)
+# # Make a grid from batch
+# out = torchvision.utils.make_grid(inputs)
 
-imshow(out, title=[class_names[x] for x in classes])
+# imshow(out, title=[class_names[x] for x in classes])
 
 
-# In[30]:
+# In[47]:
 
 
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
@@ -219,40 +239,38 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     return model
 
 
-# In[31]:
+# In[48]:
 
 
-def visualize_model(model, num_images=6):
-    was_training = model.training
-    model.eval()
-    images_so_far = 0
-    fig = plt.figure()
+# def visualize_model(model, num_images=6):
+#     was_training = model.training
+#     model.eval()
+#     images_so_far = 0
+#     fig = plt.figure()
 
-    with torch.no_grad():
-        for i, (inputs, labels) in enumerate(dataloaders['val']):
-            inputs = inputs.to(device)
-            labels = labels.to(device)
+#     with torch.no_grad():
+#         for i, (inputs, labels) in enumerate(dataloaders['val']):
+#             inputs = inputs.to(device)
+#             labels = labels.to(device)
 
-            outputs = model(inputs)
-            _, preds = torch.max(outputs, 1)
+#             outputs = model(inputs)
+#             _, preds = torch.max(outputs, 1)
 
-            for j in range(inputs.size()[0]):
-                images_so_far += 1
-                ax = plt.subplot(num_images//2, 2, images_so_far)
-                ax.axis('off')
-                ax.set_title('predicted: {}'.format(class_names[preds[j]]))
-                imshow(inputs.cpu().data[j])
+#             for j in range(inputs.size()[0]):
+#                 images_so_far += 1
+#                 ax = plt.subplot(num_images//2, 2, images_so_far)
+#                 ax.axis('off')
+#                 ax.set_title('predicted: {}'.format(class_names[preds[j]]))
+#                 imshow(inputs.cpu().data[j])
 
-                if images_so_far == num_images:
-                    model.train(mode=was_training)
-                    return
-        model.train(mode=was_training)
-
-
-# In[32]:
+#                 if images_so_far == num_images:
+#                     model.train(mode=was_training)
+#                     return
+#         model.train(mode=was_training)
 
 
-NUM_CLASSES = 5
+# In[ ]:
+
 
 model_conv = torchvision.models.resnet18(pretrained=True)
 for param in model_conv.parameters():
@@ -274,17 +292,36 @@ optimizer_conv = optim.SGD(model_conv.fc.parameters(), lr=0.001, momentum=0.9)
 exp_lr_scheduler = lr_scheduler.StepLR(optimizer_conv, step_size=7, gamma=0.1)
 
 
-# In[33]:
+# In[ ]:
 
 
-model_conv = train_model(model_conv, criterion, optimizer_conv,
-                         exp_lr_scheduler, num_epochs=25)#25)
+model_conv = train_model(model_conv, criterion, optimizer_conv, exp_lr_scheduler, num_epochs=NUM_EPOCHS)
 
 
-# In[34]:
+# ### Save Model
+
+# In[ ]:
 
 
-visualize_model(model_conv)
+model_filename = "CLASSES_" + str(NUM_CLASSES) + "_BATCHSIZE_" + str(BATCH_SIZE) + "_EPOCHS_" + str(NUM_EPOCHS) + "_IMAGES_" + str(dataset_sizes)
+torch.save(model_conv, model_filename)
 
-plt.ioff()
-plt.show()
+
+# In[ ]:
+
+
+# COMMENT OUT BEFORE RUNNING ON SERVER
+# visualize_model(model_conv)
+
+# plt.ioff()
+# plt.show()
+
+
+# # Convert Notebook to Python Script to use on server
+# Delete sections after this before running on server
+
+# In[ ]:
+
+
+get_ipython().system('jupyter nbconvert --to script classifier1.ipynb')
+
