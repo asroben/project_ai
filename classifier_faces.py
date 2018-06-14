@@ -7,7 +7,6 @@ from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV, train_test_split
 
 from PIL import Image
-from resizeimage import resizeimage
 
 
 def load_model(sess):
@@ -23,6 +22,7 @@ def retrieve_image_data(image_data, labels, key, path):
             label = label_dict[root.split('/')[-1]]
         for file in files:
             im = resize_image(cv2.imread(root + "/" + file))
+            # cv2.imwrite("augmented_data(2)/" + "/".join(root.split("/")[2:]) + "/" + file, im)
             image_data[key].append(im)
             labels[key].append(label)
     return image_data, labels
@@ -30,9 +30,9 @@ def retrieve_image_data(image_data, labels, key, path):
 
 def load_dataset(path):
     val_dir = path + "val/"
+    train_dir = path + "train/"
     image_data = {"val": [], "train": []}
     labels = {"val": [], "train": []}
-    train_dir = path + "train/"
     image_data, labels = retrieve_image_data(image_data, labels, "train", train_dir)
     image_data, labels = retrieve_image_data(image_data, labels, "val", val_dir)
     return image_data, labels
@@ -62,7 +62,7 @@ def train_classifier(embeddings, labels):
 
     svm = SVC(probability=True)
 
-    clf = GridSearchCV(svm, param_grid, cv=2, n_jobs=4)
+    clf = GridSearchCV(svm, param_grid, cv=10, n_jobs=4)
 
     clf.fit(x_train, y_train)
 
@@ -70,8 +70,30 @@ def train_classifier(embeddings, labels):
 
     return clf
 
+def init_weights(shape):
+    init_random_dist = tf.truncated_normal(shape, stddev=0.1)
+    return tf.Variable(init_random_dist)
 
-def finetune_cnn():
+def init_bias(shape):
+    init_bias_vals = tf.constant(0.1, shape=shape)
+    return tf.Variable(init_bias_vals)
+
+# python2 retrain.py --image_dir "augmented_data(2)" --output_graph "output_graph.pb" --output_labels "output_labels.txt" --how_many_training_steps 200 --train_batch_size 50 --validation_batch_size 50 --architecture="20180402-114759/model-20180402-114759"
+# Add layer before input to map to network image size
+# Retrain output with fully connected layer to classify
+def finetune_cnn(pretrained_model, data, labels):
+    number_of_classes=5
+    embeddings = tf.get_default_graph().get_tensor_by_name('embeddings:0')
+    input_size = int(embeddings.get_shape()[1])
+    W = init_weights([input_size, number_of_classes])
+    b = init_bias([number_of_classes])
+    output_layer = tf.matmul(embeddings, W) + b
+    optimizer = tf.train.AdamOptimizer()
+    loss = tf.losses.softmax_cross_entropy(labels=labels, logits=output_layer)
+    train_op = optimizer.minimize(loss, var_list=[output_layer])
+    print("Training...")
+    pretrained_model.run(train_op, feed_dict={x: data,
+                                              y: labels})
     return
 
 
@@ -80,5 +102,6 @@ if __name__ == '__main__':
     sess = tf.Session()
     pretrained_model = load_model(sess)
     image_data, labels = load_dataset(image_path)
-    embeddings = embed_images(image_data["train"])
-    clf = train_classifier(embeddings, labels["train"])
+    finetune_cnn(pretrained_model, image_data["train"], labels["train"])
+    # embeddings = embed_images(image_data["train"])
+    # clf = train_classifier(embeddings, labels["train"])
