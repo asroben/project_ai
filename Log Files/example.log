@@ -1,0 +1,23 @@
+INFO:root:CLASSES_5_BATCHSIZE_10_EPOCHS_5_TRAIN_2397_VAL_600.log
+INFO:root:Epoch 0/4
+INFO:root:----------
+INFO:root:train Loss: 1.5502 Acc: 0.3367
+INFO:root:val Loss: 1.4855 Acc: 0.3433
+INFO:root:Epoch 1/4
+INFO:root:----------
+INFO:root:train Loss: 1.2849 Acc: 0.4727
+INFO:root:val Loss: 1.2478 Acc: 0.4883
+INFO:root:Epoch 2/4
+INFO:root:----------
+INFO:root:train Loss: 1.1846 Acc: 0.5152
+INFO:root:val Loss: 1.1498 Acc: 0.5200
+INFO:root:Epoch 3/4
+INFO:root:----------
+INFO:root:train Loss: 1.1141 Acc: 0.5707
+INFO:root:val Loss: 1.1462 Acc: 0.5117
+INFO:root:Epoch 4/4
+INFO:root:----------
+INFO:root:train Loss: 1.0695 Acc: 0.5707
+INFO:root:val Loss: 1.1041 Acc: 0.5500
+INFO:root:Training complete in 1m 15s
+INFO:root:Best val Acc: 0.550000

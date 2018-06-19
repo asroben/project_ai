@@ -1,48 +1,7 @@
 
 # coding: utf-8
 
-# # NOTES
-
-# In[40]:
-
-
-# Steps made:
-
-# 1. Divide the "celeba" dataset into batches of 100 imgs each.
-#  -> We have batches 1,2,...,N
-
-# 2. Generate augmented imgs from batch 1
-#  -> parameters used (the models (3 types) and materials (5 types) are constant):
-#       - poses: (yaw, pitch, roll) = ([-10,10,10],[-5,5,5],0)     # [-10,10,10] means values {-10,0,10}
-#     so for each class, 9 images are generated from 1 img in the batch
-#
-#  -> 9*100 imgs for each class are available
-
-# 3. Sort all augmented imgs to each of the 3*5 classes
-
-# 4. For augmented imgs of each class, divide them into train,validation and test set
-#  -> Decision: 80% train, 20% validation
-
-# 5. Classifier:
-#  -> Load pretrained CNN
-#  (Method A)
-#    - Method is "use output last conv layer as feature extractor"
-#    - Then add new single fc layer which we train the to classify features to classes
-#
-#  (Method B)
-#    - Method is "fine-tune all weights from all the layers of pretrained CNN"
-#      on the training set
-#
-
-# Parameters: 
-#
-
-# 6.
-
-# 7. Save trained classifier on disk
-
-
-# In[41]:
+# In[1]:
 
 
 # License: BSD
@@ -61,29 +20,30 @@ import matplotlib.pyplot as plt
 import time
 import os
 import copy
+import logging
 
 plt.ion()   # interactive mode
 
 
 # ### Model Settings
 
-# In[42]:
+# In[2]:
 
 
 # SETTINGS
-BATCH_SIZE = 3
-NUM_CLASSES = 5
+BATCH_SIZE = 10
+NUM_CLASSES = 25
 NUM_EPOCHS = 1
 
 
 # Local Directory
-data_dir = 'augmented_data'
+data_dir = 'processed_data'
 
 # Directory on DAS4
-#data_dir = '/var/scratch/prai1809'
+#data_dir = '/var/scratch/prai1809/processed_data'
 
 
-# In[43]:
+# In[3]:
 
 
 # The CNN we use wants input dimensions of 3x224x224
@@ -127,13 +87,26 @@ class_names = image_datasets['train'].classes
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
-# In[44]:
+# In[4]:
 
 
 image_datasets['train'].classes
 
 
-# In[45]:
+# ### Logging
+
+# In[5]:
+
+
+model_filename = 'CLASSES_{}_BATCHSIZE_{}_EPOCHS_{}_TRAIN_{}_VAL_{}'.format(NUM_CLASSES, BATCH_SIZE,NUM_EPOCHS, dataset_sizes['train'], dataset_sizes['val']  )
+
+LOG_FILENAME = model_filename + ".log"
+logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO)
+logging.info(LOG_FILENAME)
+print(LOG_FILENAME)
+
+
+# In[6]:
 
 
 # for i,c in iter(dataloaders['train']):
@@ -141,7 +114,7 @@ image_datasets['train'].classes
 #     print(c)
 
 
-# In[46]:
+# In[7]:
 
 
 # COMMENT OUT WHEN RUNNING SCRIPT ON SERVER
@@ -168,7 +141,7 @@ image_datasets['train'].classes
 # imshow(out, title=[class_names[x] for x in classes])
 
 
-# In[47]:
+# In[8]:
 
 
 def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
@@ -179,7 +152,10 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
     for epoch in range(num_epochs):
         print('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        logging.info('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        
         print('-' * 10)
+        logging.info('-' * 10)
 
         # Each epoch has a training and validation phase
         for phase in ['train', 'val']:
@@ -219,8 +195,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(
-                phase, epoch_loss, epoch_acc))
+            print('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
+            logging.info('{} Loss: {:.4f} Acc: {:.4f}'.format(phase, epoch_loss, epoch_acc))
 
             # deep copy the model
             if phase == 'val' and epoch_acc > best_acc:
@@ -230,16 +206,17 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
         print()
 
     time_elapsed = time.time() - since
-    print('Training complete in {:.0f}m {:.0f}s'.format(
-        time_elapsed // 60, time_elapsed % 60))
+    print('Training complete in {:.0f}m {:.0f}s'.format( time_elapsed // 60, time_elapsed % 60))
+    logging.info('Training complete in {:.0f}m {:.0f}s'.format( time_elapsed // 60, time_elapsed % 60))
     print('Best val Acc: {:4f}'.format(best_acc))
+    logging.info('Best val Acc: {:4f}'.format(best_acc))
 
     # load best model weights
     model.load_state_dict(best_model_wts)
     return model
 
 
-# In[48]:
+# In[9]:
 
 
 # def visualize_model(model, num_images=6):
@@ -303,7 +280,6 @@ model_conv = train_model(model_conv, criterion, optimizer_conv, exp_lr_scheduler
 # In[ ]:
 
 
-model_filename = "CLASSES_" + str(NUM_CLASSES) + "_BATCHSIZE_" + str(BATCH_SIZE) + "_EPOCHS_" + str(NUM_EPOCHS) + "_IMAGES_" + str(dataset_sizes)
 torch.save(model_conv, model_filename)
 
 
