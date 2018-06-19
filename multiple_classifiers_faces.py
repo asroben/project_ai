@@ -2,13 +2,19 @@ import tensorflow as tf
 import numpy as np
 import cv2
 import os
+import time
 
+from sklearn.linear_model import SGDClassifier
 from sklearn.svm import SVC
 from sklearn.model_selection import GridSearchCV, train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.naive_bayes import BernoulliNB
+
 
 from PIL import Image
+CLASSIFIERS = ["svm", "bernnb", "dtree", "sgd"]
 
-
+# Load in training and test set images
 def load_model(sess):
     saver = tf.train.import_meta_graph('20180402-114759/model-20180402-114759.meta')
     saver.restore(sess, '20180402-114759/model-20180402-114759.ckpt-275')
@@ -52,21 +58,38 @@ def embed_images(image_list):
     return embeddings
 
 
-def train_classifier(embeddings, labels):
-    x_train, x_test, y_train, y_test = train_test_split(embeddings, labels, test_size=0.2)
+def train_classifier(embeddings, labels, classifier):
+    # x_train, x_test, y_train, y_test = train_test_split(embeddings, labels, test_size=0.2)
+    x_train = embeddings
+    y_train = labels
+    if classifier == "svm":
+        param_grid = [
+            {'C': [1, 10, 100, 1000], 'kernel': ['linear']},
+            {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001], 'kernel': ['rbf']},
+        ]
+        clfs = SVC(probability=True)
 
-    param_grid = [
-        {'C': [1, 10, 100, 1000], 'kernel': ['linear']},
-        {'C': [1, 10, 100, 1000], 'gamma': [0.001, 0.0001], 'kernel': ['rbf']},
-    ]
+    elif classifier == "bernnb":
+        param_grid = [
+            {'alpha': [0.1, 0.5, 0.8, 1]}]
+        clfs =  BernoulliNB()
 
-    svm = SVC(probability=True)
+    elif classifier == "dtree":
+        clfs = DecisionTreeClassifier(random_state=0)
+        param_grid = {'criterion': ['gini', 'entropy'],
+                     'max_depth': [4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 20, 30, 40, 50, 70, 90, 120, 150]}
+    elif classifier == "sgd":
+        param_grid = {
+            'alpha': (0.00001, 0.000001),
+            'penalty': ('l2', 'elasticnet'),
+            'max_iter': (10, 50, 80, 150, 400, 800),
+        }
+        clfs = SGDClassifier()
 
-    clf = GridSearchCV(svm, param_grid, cv=10, n_jobs=4)
+    clf = GridSearchCV(clfs, param_grid, cv=10, n_jobs=4)
 
+    print("Training...")
     clf.fit(x_train, y_train)
-
-    print(clf.score(x_test, y_test))
 
     return clf
 
@@ -78,30 +101,18 @@ def init_bias(shape):
     init_bias_vals = tf.constant(0.1, shape=shape)
     return tf.Variable(init_bias_vals)
 
-# python2 retrain.py --image_dir "augmented_data(2)" --output_graph "output_graph.pb" --output_labels "output_labels.txt" --how_many_training_steps 200 --train_batch_size 50 --validation_batch_size 50 --architecture="20180402-114759/model-20180402-114759"
-# Add layer before input to map to network image size
-# Retrain output with fully connected layer to classify
-def finetune_cnn(pretrained_model, data, labels):
-    number_of_classes=5
-    embeddings = tf.get_default_graph().get_tensor_by_name('embeddings:0')
-    input_size = int(embeddings.get_shape()[1])
-    W = init_weights([input_size, number_of_classes])
-    b = init_bias([number_of_classes])
-    output_layer = tf.matmul(embeddings, W) + b
-    optimizer = tf.train.AdamOptimizer()
-    loss = tf.losses.softmax_cross_entropy(labels=labels, logits=output_layer)
-    train_op = optimizer.minimize(loss, var_list=[output_layer])
-    print("Training...")
-    pretrained_model.run(train_op, feed_dict={x: data,
-                                              y: labels})
-    return
-
 
 if __name__ == '__main__':
     image_path = "augmented_data/"
     sess = tf.Session()
     pretrained_model = load_model(sess)
     image_data, labels = load_dataset(image_path)
-    finetune_cnn(pretrained_model, image_data["train"], labels["train"])
-    # embeddings = embed_images(image_data["train"])
-    # clf = train_classifier(embeddings, labels["train"])
+    embeddings = embed_images(image_data["train"])
+    embeddings_test = embed_images(image_data["val"])
+    for classifier in CLASSIFIERS:
+        start = time.time()
+        clf = train_classifier(embeddings, labels["train"], classifier)
+        end = time.time()
+        print("Time elapsed: " + str(end-start))
+        print(classifier + ":")
+        print("Accuracy: " + str(clf.score(embeddings_test, labels["val"])))
