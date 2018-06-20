@@ -31,16 +31,16 @@ plt.ion()   # interactive mode
 
 
 # SETTINGS
-BATCH_SIZE = 10
+BATCH_SIZE = 3
 NUM_CLASSES = 25
-NUM_EPOCHS = 1
+NUM_EPOCHS = 25
 
 
 # Local Directory
-data_dir = 'processed_data'
+#data_dir = 'processed_data'
 
 # Directory on DAS4
-#data_dir = '/var/scratch/prai1809/processed_data'
+data_dir = '/var/scratch/prai1809/processed_data'
 
 
 # In[3]:
@@ -299,5 +299,5 @@ torch.save(model_conv, model_filename)
 # In[ ]:
 
 
-get_ipython().system('jupyter nbconvert --to script classifier1.ipynb')
+#get_ipython().system('jupyter nbconvert --to script classifier1.ipynb')
 

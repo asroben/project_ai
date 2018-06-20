@@ -1,5 +1,8 @@
 .ipynb_checkpoints
 /Received_Batches_200_BaseImages_5_Frames_5_Colors
+/Received_Batches_200_BaseImages_5_Frames_5_Colors_3Poses_Upscaled/
 /batch
 /batch_eye_region
 /processed_data
+processed_data_upscaled.zip
+processed_data_upscaled_eye_region.zip
