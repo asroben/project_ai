@@ -4,5 +4,10 @@
 /batch
 /batch_eye_region
 /processed_data
+/Data
+/standard_data_set
+/Trained_Models
+/standard_data_set
+/processed_data_unscaled
 processed_data_upscaled.zip
 processed_data_upscaled_eye_region.zip

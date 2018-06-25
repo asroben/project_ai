@@ -1,0 +1,9 @@
+INFO:root:FREEZEWEIGHTS_True_CLASSES_25_BATCHSIZE_10_EPOCHS_1_TRAIN_10500_VAL_2250_Test2250.log
+INFO:root:Epoch 1/1
+INFO:root:----------
+INFO:root:train Loss: 1.5326 Acc: 0.5339
+INFO:root:val Loss: 0.7657 Acc: 0.7756
+INFO:root:Training complete in 1m 13s
+INFO:root:Best val Acc: 0.775556
+INFO:root:Evaluating Test Set
+INFO:root:Test Acc: 0.768444

@@ -34,13 +34,13 @@ plt.ion()   # interactive mode
 FREEZE_WEIGHTS = False
 BATCH_SIZE = 10
 NUM_CLASSES = 25
-NUM_EPOCHS = 1
+NUM_EPOCHS = 2
 
 # Local Directory
-data_dir = 'processed_data'
+#data_dir = 'processed_data'
 
 # Directory on DAS4
-#data_dir = '/var/scratch/prai1809/processed_data'
+data_dir = '/var/scratch/prai1809/processed_data'
 
 
 # In[3]:
@@ -64,6 +64,12 @@ data_transforms = {
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
+    'test': transforms.Compose([
+        transforms.Resize(256),
+        transforms.CenterCrop(224),
+        transforms.ToTensor(),
+        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+    ]),
 }
 
 # Data folder structure:
@@ -77,11 +83,11 @@ data_transforms = {
 
 image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
                                           data_transforms[x])
-                  for x in ['train', 'val']}
+                  for x in ['train', 'val', 'test']}
 dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=BATCH_SIZE,
                                              shuffle=True, num_workers=4)
-              for x in ['train', 'val']}
-dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val']}
+              for x in ['train', 'val', 'test']}
+dataset_sizes = {x: len(image_datasets[x]) for x in ['train', 'val', 'test']}
 class_names = image_datasets['train'].classes
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -99,7 +105,7 @@ image_datasets['train'].classes
 # In[5]:
 
 
-model_filename = 'FREEZEWEIGHTS_{}_CLASSES_{}_BATCHSIZE_{}_EPOCHS_{}_TRAIN_{}_VAL_{}'.format(FREEZE_WEIGHTS, NUM_CLASSES, BATCH_SIZE,NUM_EPOCHS, dataset_sizes['train'], dataset_sizes['val']  )
+model_filename = 'FREEZEWEIGHTS_{}_CLASSES_{}_BATCHSIZE_{}_EPOCHS_{}_TRAIN_{}_VAL_{}_Test{}'.format(FREEZE_WEIGHTS, NUM_CLASSES, BATCH_SIZE,NUM_EPOCHS, dataset_sizes['train'], dataset_sizes['val'], dataset_sizes['test'])
 
 LOG_FILENAME = model_filename + ".log"
 logging.basicConfig(filename=LOG_FILENAME,level=logging.INFO)
@@ -144,8 +150,8 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     best_acc = 0.0
 
     for epoch in range(num_epochs):
-        print('Epoch {}/{}'.format(epoch, num_epochs - 1))
-        logging.info('Epoch {}/{}'.format(epoch, num_epochs - 1))
+        print('Epoch {}/{}'.format(epoch + 1, num_epochs))
+        logging.info('Epoch {}/{}'.format(epoch + 1, num_epochs))
         
         print('-' * 10)
         logging.info('-' * 10)
@@ -239,7 +245,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 #         model.train(mode=was_training)
 
 
-# In[ ]:
+# In[9]:
 
 
 if FREEZE_WEIGHTS == True:
@@ -281,7 +287,7 @@ else:
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
 
-# In[ ]:
+# In[10]:
 
 
 if FREEZE_WEIGHTS == True:
@@ -290,15 +296,73 @@ else:
     model_ft = train_model(model_ft, criterion, optimizer_ft, exp_lr_scheduler, num_epochs=NUM_EPOCHS)
 
 
+# ### Evaluate on Separate Test Set
+
+# In[11]:
+
+
+def test_model(model, criterion, optimizer):
+    since = time.time()
+
+    best_model_wts = copy.deepcopy(model.state_dict())
+    best_acc = 0.0
+    
+    print()
+    print('Evaluating Test Set')
+    logging.info('Evaluating Test Set')
+    
+    model.eval()   # Set model to evaluate mode
+
+    phase = 'test'
+    
+    running_loss = 0.0
+    running_corrects = 0
+    
+    for inputs, labels in dataloaders[phase]:
+                inputs = inputs.to(device)
+                labels = labels.to(device)
+
+                # zero the parameter gradients
+                optimizer.zero_grad()
+
+                # forward
+                # track history if only in train
+                with torch.set_grad_enabled(phase == 'train'):
+                    outputs = model(inputs)
+                    _, preds = torch.max(outputs, 1)
+                    loss = criterion(outputs, labels)
+
+                # statistics
+                running_loss += loss.item() * inputs.size(0)
+                running_corrects += torch.sum(preds == labels.data)
+    
+    loss = running_loss / dataset_sizes[phase]
+    acc = running_corrects.double() / dataset_sizes[phase]
+    
+    print('Test Acc: {:4f}'.format(acc))
+    logging.info('Test Acc: {:4f}'.format(acc))
+    
+
+
+# In[ ]:
+
+
+# Evaluate Model
+if FREEZE_WEIGHTS == True:
+    test_model(model_conv, criterion, optimizer_conv)
+else:
+    test_model(model_ft, criterion, optimizer_ft)
+
+
 # ### Save Model
 
 # In[ ]:
 
 
 if FREEZE_WEIGHTS == True:
-    torch.save(model_conv, model_filename)
+   torch.save(model_conv, model_filename)
 else:
-    torch.save(model_ft, model_filename)
+   torch.save(model_ft, model_filename)
 
 
 # In[ ]:
@@ -314,14 +378,8 @@ else:
 # # Convert Notebook to Python Script to use on server
 # Delete sections after this before running on server
 
-# In[27]:
-
-
-get_ipython().system('jupyter nbconvert --to script classifier_new.ipynb')
-
-
 # In[ ]:
 
 
-
+#get_ipython().system('jupyter nbconvert --to script classifier_new.ipynb')
 

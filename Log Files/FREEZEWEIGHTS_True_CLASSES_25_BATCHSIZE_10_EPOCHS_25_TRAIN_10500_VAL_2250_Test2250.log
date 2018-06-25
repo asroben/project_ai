@@ -1,0 +1,105 @@
+INFO:root:FREEZEWEIGHTS_True_CLASSES_25_BATCHSIZE_10_EPOCHS_25_TRAIN_10500_VAL_2250_Test2250.log
+INFO:root:Epoch 1/25
+INFO:root:----------
+INFO:root:train Loss: 1.5007 Acc: 0.5535
+INFO:root:val Loss: 0.7648 Acc: 0.7693
+INFO:root:Epoch 2/25
+INFO:root:----------
+INFO:root:train Loss: 0.8257 Acc: 0.7557
+INFO:root:val Loss: 0.5583 Acc: 0.8293
+INFO:root:Epoch 3/25
+INFO:root:----------
+INFO:root:train Loss: 0.6565 Acc: 0.8093
+INFO:root:val Loss: 0.4793 Acc: 0.8471
+INFO:root:Epoch 4/25
+INFO:root:----------
+INFO:root:train Loss: 0.5683 Acc: 0.8337
+INFO:root:val Loss: 0.4089 Acc: 0.8764
+INFO:root:Epoch 5/25
+INFO:root:----------
+INFO:root:train Loss: 0.5179 Acc: 0.8492
+INFO:root:val Loss: 0.3985 Acc: 0.8720
+INFO:root:Epoch 6/25
+INFO:root:----------
+INFO:root:train Loss: 0.4766 Acc: 0.8570
+INFO:root:val Loss: 0.3751 Acc: 0.8787
+INFO:root:Epoch 7/25
+INFO:root:----------
+INFO:root:train Loss: 0.4428 Acc: 0.8670
+INFO:root:val Loss: 0.3500 Acc: 0.8849
+INFO:root:Epoch 8/25
+INFO:root:----------
+INFO:root:train Loss: 0.4062 Acc: 0.8867
+INFO:root:val Loss: 0.3387 Acc: 0.8929
+INFO:root:Epoch 9/25
+INFO:root:----------
+INFO:root:train Loss: 0.4045 Acc: 0.8841
+INFO:root:val Loss: 0.3545 Acc: 0.8809
+INFO:root:Epoch 10/25
+INFO:root:----------
+INFO:root:train Loss: 0.3965 Acc: 0.8914
+INFO:root:val Loss: 0.3321 Acc: 0.8942
+INFO:root:Epoch 11/25
+INFO:root:----------
+INFO:root:train Loss: 0.3932 Acc: 0.8860
+INFO:root:val Loss: 0.3355 Acc: 0.8884
+INFO:root:Epoch 12/25
+INFO:root:----------
+INFO:root:train Loss: 0.3988 Acc: 0.8882
+INFO:root:val Loss: 0.3358 Acc: 0.8898
+INFO:root:Epoch 13/25
+INFO:root:----------
+INFO:root:train Loss: 0.3835 Acc: 0.8945
+INFO:root:val Loss: 0.3490 Acc: 0.8849
+INFO:root:Epoch 14/25
+INFO:root:----------
+INFO:root:train Loss: 0.3922 Acc: 0.8874
+INFO:root:val Loss: 0.3231 Acc: 0.8969
+INFO:root:Epoch 15/25
+INFO:root:----------
+INFO:root:train Loss: 0.3869 Acc: 0.8915
+INFO:root:val Loss: 0.3292 Acc: 0.8938
+INFO:root:Epoch 16/25
+INFO:root:----------
+INFO:root:train Loss: 0.3785 Acc: 0.8963
+INFO:root:val Loss: 0.3202 Acc: 0.9000
+INFO:root:Epoch 17/25
+INFO:root:----------
+INFO:root:train Loss: 0.3898 Acc: 0.8930
+INFO:root:val Loss: 0.3350 Acc: 0.8933
+INFO:root:Epoch 18/25
+INFO:root:----------
+INFO:root:train Loss: 0.3878 Acc: 0.8903
+INFO:root:val Loss: 0.3324 Acc: 0.8942
+INFO:root:Epoch 19/25
+INFO:root:----------
+INFO:root:train Loss: 0.3843 Acc: 0.8945
+INFO:root:val Loss: 0.3254 Acc: 0.8964
+INFO:root:Epoch 20/25
+INFO:root:----------
+INFO:root:train Loss: 0.3839 Acc: 0.8925
+INFO:root:val Loss: 0.3318 Acc: 0.8929
+INFO:root:Epoch 21/25
+INFO:root:----------
+INFO:root:train Loss: 0.3804 Acc: 0.8937
+INFO:root:val Loss: 0.3314 Acc: 0.8951
+INFO:root:Epoch 22/25
+INFO:root:----------
+INFO:root:train Loss: 0.3845 Acc: 0.8949
+INFO:root:val Loss: 0.3293 Acc: 0.8933
+INFO:root:Epoch 23/25
+INFO:root:----------
+INFO:root:train Loss: 0.3882 Acc: 0.8930
+INFO:root:val Loss: 0.3233 Acc: 0.8973
+INFO:root:Epoch 24/25
+INFO:root:----------
+INFO:root:train Loss: 0.3925 Acc: 0.8932
+INFO:root:val Loss: 0.3285 Acc: 0.8951
+INFO:root:Epoch 25/25
+INFO:root:----------
+INFO:root:train Loss: 0.3894 Acc: 0.8900
+INFO:root:val Loss: 0.3299 Acc: 0.8929
+INFO:root:Training complete in 25m 42s
+INFO:root:Best val Acc: 0.900000
+INFO:root:Evaluating Test Set
+INFO:root:Test Acc: 0.891556

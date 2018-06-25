@@ -1,0 +1,10 @@
+INFO:root:FREEZEWEIGHTS_False_CLASSES_25_BATCHSIZE_10_EPOCHS_1_TRAIN_12000_VAL_3000.log
+INFO:root:Epoch 0/0
+INFO:root:----------
+INFO:root:FREEZEWEIGHTS_True_CLASSES_25_BATCHSIZE_10_EPOCHS_1_TRAIN_12000_VAL_3000.log
+INFO:root:Epoch 0/0
+INFO:root:----------
+INFO:root:train Loss: 1.4365 Acc: 0.5685
+INFO:root:val Loss: 0.7418 Acc: 0.7950
+INFO:root:Training complete in 24m 43s
+INFO:root:Best val Acc: 0.795000
