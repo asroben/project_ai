@@ -31,16 +31,16 @@ plt.ion()   # interactive mode
 
 
 # SETTINGS
-FREEZE_WEIGHTS = False
+FREEZE_WEIGHTS = True
 BATCH_SIZE = 10
 NUM_CLASSES = 25
-NUM_EPOCHS = 2
+NUM_EPOCHS = 25
 
 # Local Directory
 #data_dir = 'processed_data'
 
 # Directory on DAS4
-data_dir = '/var/scratch/prai1809/processed_data'
+data_dir = '/var/scratch/prai1809/processed_data_yaw10'
 
 
 # In[3]:
@@ -344,7 +344,7 @@ def test_model(model, criterion, optimizer):
     
 
 
-# In[ ]:
+# In[12]:
 
 
 # Evaluate Model
@@ -356,7 +356,7 @@ else:
 
 # ### Save Model
 
-# In[ ]:
+# In[13]:
 
 
 if FREEZE_WEIGHTS == True:
@@ -365,7 +365,7 @@ else:
    torch.save(model_ft, model_filename)
 
 
-# In[ ]:
+# In[14]:
 
 
 # COMMENT OUT BEFORE RUNNING ON SERVER
@@ -378,7 +378,7 @@ else:
 # # Convert Notebook to Python Script to use on server
 # Delete sections after this before running on server
 
-# In[ ]:
+# In[15]:
 
 
 #get_ipython().system('jupyter nbconvert --to script classifier_new.ipynb')
